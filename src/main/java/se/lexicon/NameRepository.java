@@ -1,5 +1,7 @@
 package se.lexicon;
 
+import java.util.Arrays;
+
 /**
  * The NameRepository class provides methods to manage a list of names.
  * It offers functionalities such as adding, removing, finding, and updating names.
@@ -16,7 +18,7 @@ public class NameRepository {
      */
     public static int getSize() {
         //todo: implement getSize method
-        return 0;
+        return names.length;
     }
 
 
@@ -27,6 +29,7 @@ public class NameRepository {
      */
     public static void setNames(String[] names) {
         //todo: implement setNames method
+        NameRepository.names = names;
     }
 
 
@@ -35,6 +38,7 @@ public class NameRepository {
      */
     public static void clear() {
         //todo: implement clear method
+        names = Arrays.copyOf(names, 0);
     }
 
 
@@ -45,7 +49,8 @@ public class NameRepository {
      */
     public static String[] findAll() {
         //todo: implement findAll method
-        return null;
+        String[] copyOfNamesArray = names;
+        return copyOfNamesArray;
     }
 
 
@@ -57,7 +62,12 @@ public class NameRepository {
      */
     public static String find(String fullName) {
         //todo: implement find method
-        return null;
+        int indexOfTarget = Arrays.binarySearch(names, fullName);
+        if (indexOfTarget < 0) {
+            return null;
+        } else {
+            return names[indexOfTarget];
+        }
     }
 
 
@@ -69,7 +79,15 @@ public class NameRepository {
      */
     public static boolean add(String fullName) {
         //todo: implement add method
-        return false;
+        int isNameNew = Arrays.binarySearch(names, fullName);
+        if (isNameNew < 0) { //check if name is new
+            names = Arrays.copyOf(names, names.length + 1);
+            names[names.length - 1] = fullName;
+            return true;
+        } else {
+            return false;
+        }
+
     }
 
 
@@ -81,7 +99,23 @@ public class NameRepository {
      */
     public static String[] findByFirstName(String firstName) {
         //todo: findByFirstName method
-        return null;
+        boolean isFirstName;
+        String[] foundNames = new String[0];
+        int nameCounter = 0;
+
+        for (int i = 0; i < names.length; i++) {
+            isFirstName = names[i].startsWith(firstName);
+            if (isFirstName) {
+                foundNames = Arrays.copyOf(foundNames, foundNames.length + 1);
+                foundNames[nameCounter] = names[i];
+                nameCounter++;
+            }
+        }
+        if (nameCounter == 0) {
+            foundNames = Arrays.copyOf(foundNames, foundNames.length + 1);
+            foundNames[0] = "No names found with first name: " + firstName;
+        }
+        return foundNames;
     }
 
 
@@ -93,7 +127,23 @@ public class NameRepository {
      */
     public static String[] findByLastName(String lastName) {
         //todo: implement findByLastName method
-        return null;
+        boolean isLastName;
+        String[] foundNames = new String[0];
+        int nameCounter = 0;
+
+        for (int i = 0; i < names.length; i++) {
+            isLastName = names[i].endsWith(lastName);
+            if (isLastName) {
+                foundNames = Arrays.copyOf(foundNames, foundNames.length + 1);
+                foundNames[nameCounter] = names[i];
+                nameCounter++;
+            }
+        }
+        if (nameCounter == 0) {
+            foundNames = Arrays.copyOf(foundNames, foundNames.length + 1);
+            foundNames[0] = "No names found with last name: " + lastName;
+        }
+        return foundNames;
     }
 
 
@@ -106,7 +156,18 @@ public class NameRepository {
      */
     public static boolean update(String original, String updatedName) {
         //todo: implement update method
-        return false;
+        int canOriginalNameBeFound = Arrays.binarySearch(names, original);
+        if (canOriginalNameBeFound >= 0) {
+            int isUpdatedNameNew = Arrays.binarySearch(names, updatedName);
+            if (isUpdatedNameNew < 0) {
+                names[canOriginalNameBeFound] = updatedName;
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 
 
@@ -118,8 +179,17 @@ public class NameRepository {
      */
     public static boolean remove(String fullName) {
         //todo: implement remove method
-        return false;
+        int indexOfNameFound = Arrays.binarySearch(names, fullName);
+        if (indexOfNameFound < 0) { //if less than zero name was not found
+            return false;
+        }
+        for (int i = 0; i < names.length; i++) {
+            if (i == indexOfNameFound) { //skip adding the name at this index to the new array
+
+            }
+        }
+        return true;
+
+
     }
-
-
 }
