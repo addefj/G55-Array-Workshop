@@ -18,7 +18,7 @@ public class NameRepository {
      */
     public static int getSize() {
         //todo: implement getSize method
-        return names.length;
+        return names.length; //returns the current length(size) of the array
     }
 
 
@@ -29,7 +29,8 @@ public class NameRepository {
      */
     public static void setNames(String[] names) {
         //todo: implement setNames method
-        NameRepository.names = names;
+        NameRepository.names = names; //create a new array with the same name, and move the reference to it instead
+        Arrays.sort(names, String.CASE_INSENSITIVE_ORDER); //sort the names in the new array
     }
 
 
@@ -38,7 +39,8 @@ public class NameRepository {
      */
     public static void clear() {
         //todo: implement clear method
-        names = Arrays.copyOf(names, 0);
+        names = new String[0]; //creates a new array with the same name.
+        //names = Arrays.copyOf(names, 0); //another way of solving it, but could be worse in performance
     }
 
 
@@ -49,8 +51,7 @@ public class NameRepository {
      */
     public static String[] findAll() {
         //todo: implement findAll method
-        String[] copyOfNamesArray = names;
-        return copyOfNamesArray;
+        return Arrays.copyOf(names, names.length); //returns an exact copy of names
     }
 
 
@@ -62,12 +63,12 @@ public class NameRepository {
      */
     public static String find(String fullName) {
         //todo: implement find method
-        int indexOfTarget = Arrays.binarySearch(names, fullName);
-        if (indexOfTarget < 0) {
-            return null;
-        } else {
-            return names[indexOfTarget];
+        for (String name : names) { //loops through array, and return name if found
+            if (name.equalsIgnoreCase(fullName)) { //compares names case insensitively
+                return name;
+            }
         }
+        return null; //returns null if name was not found
     }
 
 
@@ -79,10 +80,12 @@ public class NameRepository {
      */
     public static boolean add(String fullName) {
         //todo: implement add method
-        int isNameNew = Arrays.binarySearch(names, fullName);
-        if (isNameNew < 0) { //check if name is new
+        Arrays.sort(names, String.CASE_INSENSITIVE_ORDER); //sort the names before binary search
+        int isNameNew = Arrays.binarySearch(names, fullName); //search if name to be added is found
+        if (isNameNew < 0) { //if new, expand array and add it to the back
             names = Arrays.copyOf(names, names.length + 1);
             names[names.length - 1] = fullName;
+            Arrays.sort(names, String.CASE_INSENSITIVE_ORDER); //sort the names after the new name was added
             return true;
         } else {
             return false;
@@ -99,21 +102,20 @@ public class NameRepository {
      */
     public static String[] findByFirstName(String firstName) {
         //todo: findByFirstName method
-        boolean isFirstName;
         String[] foundNames = new String[0];
-        int nameCounter = 0;
+        firstName = firstName.toLowerCase(); //converts string to lowercase for case-insensitive comparison
+        int nameCounter = 0; //counter for found names, for index use
 
-        for (int i = 0; i < names.length; i++) {
-            isFirstName = names[i].startsWith(firstName);
-            if (isFirstName) {
-                foundNames = Arrays.copyOf(foundNames, foundNames.length + 1);
-                foundNames[nameCounter] = names[i];
-                nameCounter++;
+        for (String name : names) {
+            if (name.toLowerCase().startsWith(firstName)) { //if the names matches
+                foundNames = Arrays.copyOf(foundNames, foundNames.length + 1); //expand the array before adding the name found
+                foundNames[nameCounter] = name; //add the full name to the new array
+                nameCounter++; //increase found name counter
             }
         }
         if (nameCounter == 0) {
             foundNames = Arrays.copyOf(foundNames, foundNames.length + 1);
-            foundNames[0] = "No names found with first name: " + firstName;
+            foundNames[0] = "No matches found for first name: " + firstName;
         }
         return foundNames;
     }
@@ -127,16 +129,15 @@ public class NameRepository {
      */
     public static String[] findByLastName(String lastName) {
         //todo: implement findByLastName method
-        boolean isLastName;
         String[] foundNames = new String[0];
+        lastName = lastName.toLowerCase(); //converts string to lowercase for case-insensitive comparison
         int nameCounter = 0;
 
-        for (int i = 0; i < names.length; i++) {
-            isLastName = names[i].endsWith(lastName);
-            if (isLastName) {
-                foundNames = Arrays.copyOf(foundNames, foundNames.length + 1);
-                foundNames[nameCounter] = names[i];
-                nameCounter++;
+        for (String name : names) {
+            if (name.toLowerCase().endsWith(lastName)) { //if the name matches
+                foundNames = Arrays.copyOf(foundNames, foundNames.length + 1); //expand the array before adding the name found
+                foundNames[nameCounter] = name; //add the full name to the new array
+                nameCounter++; //increase found name counter
             }
         }
         if (nameCounter == 0) {
@@ -156,11 +157,11 @@ public class NameRepository {
      */
     public static boolean update(String original, String updatedName) {
         //todo: implement update method
-        int canOriginalNameBeFound = Arrays.binarySearch(names, original);
-        if (canOriginalNameBeFound >= 0) {
-            int isUpdatedNameNew = Arrays.binarySearch(names, updatedName);
-            if (isUpdatedNameNew < 0) {
-                names[canOriginalNameBeFound] = updatedName;
+        int originalNameIndex = Arrays.binarySearch(names, original);
+        if (originalNameIndex >= 0) {
+            if (Arrays.binarySearch(names, updatedName) < 0) { //if index of updated name is less than zero it wasn't found
+                names[originalNameIndex] = updatedName;
+                Arrays.sort(names, String.CASE_INSENSITIVE_ORDER); //sort the names after updating name
                 return true;
             } else {
                 return false;
@@ -179,25 +180,50 @@ public class NameRepository {
      */
     public static boolean remove(String fullName) {
         //todo: implement remove method
-        String[] tempArray = new String[0];
+        String[] tempArray = new String[names.length - 1]; //temporary array to store names during removal
+        int tempCounter = 0;
+        int indexOfNameToBeRemoved = -1; //initiate to -1 in case no matching name was found
+        for (int i = 0; i < names.length; i++) {
+            if (names[i].equalsIgnoreCase(fullName)) {
+                indexOfNameToBeRemoved = i; //if name was found, save the index for it
+                break; //exit loop early if name was found.
+            }
+        }
+        if(indexOfNameToBeRemoved < 0){
+            return false; //return false if name was not found
+        }
+
+        for(int i = 0; i < names.length; i++){ //iterate through the array and add every name but the index to be removed
+            if(i != indexOfNameToBeRemoved){
+                tempArray[tempCounter] = names[i]; //add name to tempArray
+                tempCounter++;
+            }
+        }
+        names = tempArray;
+        return true;
+
+
+        //alternative solution, isn't case-insensitve
+        /*
+        String[] tempArray = new String[names.length];
+        fullName = fullName.toLowerCase(); //coverts string to lowercase before comparison
         int tempIndexCounter = 0;
         int indexOfNameFound = Arrays.binarySearch(names, fullName);
         if (indexOfNameFound < 0) { //if less than zero name was not found
             return false;
         }
         for (int i = 0; i < names.length; i++) {
-            if (i == indexOfNameFound) {  //prevent original name to be copied to tempArray
-            continue; //skip to the next iteration
-            }else{
-                tempArray = Arrays.copyOf(tempArray, tempArray.length +1); //expand tempArray to fit next name
+            if (i == indexOfNameFound) {  //when it comes to original name skip to next
+                continue; //skip to the next iteration
+            } else {
                 tempArray[tempIndexCounter] = names[i]; //add every name to temp array
                 tempIndexCounter++;
             }
         }
-        names = Arrays.copyOf(tempArray, tempArray.length); //copy tempArray to names array
+        names = Arrays.copyOf(tempArray, tempIndexCounter); //copy tempArray to names array
 
         return true;
 
-
+         */
     }
 }
