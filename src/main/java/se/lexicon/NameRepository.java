@@ -179,15 +179,23 @@ public class NameRepository {
      */
     public static boolean remove(String fullName) {
         //todo: implement remove method
+        String[] tempArray = new String[0];
+        int tempIndexCounter = 0;
         int indexOfNameFound = Arrays.binarySearch(names, fullName);
         if (indexOfNameFound < 0) { //if less than zero name was not found
             return false;
         }
         for (int i = 0; i < names.length; i++) {
-            if (i == indexOfNameFound) { //skip adding the name at this index to the new array
-
+            if (i == indexOfNameFound) {  //prevent original name to be copied to tempArray
+            continue; //skip to the next iteration
+            }else{
+                tempArray = Arrays.copyOf(tempArray, tempArray.length +1); //expand tempArray to fit next name
+                tempArray[tempIndexCounter] = names[i]; //add every name to temp array
+                tempIndexCounter++;
             }
         }
+        names = Arrays.copyOf(tempArray, tempArray.length); //copy tempArray to names array
+
         return true;
 
 

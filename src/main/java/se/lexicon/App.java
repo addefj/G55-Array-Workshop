@@ -30,7 +30,8 @@ public class App {
         NameRepository.update("Kalle Moraeus", "Kalle Kula");
         System.out.println(Arrays.toString(NameRepository.findAll())); //get all names and print them
 
-        NameRepository.remove("Kalle Kula");
+        NameRepository.remove("Kalle Kula"); //remove name from array
+        System.out.println(Arrays.toString(NameRepository.findAll())); //get all names and print them
 
     }
 }
